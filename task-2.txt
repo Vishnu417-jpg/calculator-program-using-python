@@ -1,0 +1,141 @@
+# ==========================================
+# TO-DO LIST APPLICATION
+# Python Developer Internship - Task 2
+# ==========================================
+
+import os
+
+FILE_NAME = "tasks.txt"
+
+
+# Load tasks from file
+def load_tasks():
+    tasks = []
+    
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r", encoding="utf-8") as file:
+            for line in file:
+                line = line.strip()
+                if "|" in line:
+                    status, task = line.split("|", 1)
+                    tasks.append({"task": task, "status": status})
+    
+    return tasks
+
+
+# Save tasks to file
+def save_tasks(tasks):
+    with open(FILE_NAME, "w", encoding="utf-8") as file:
+        for task in tasks:
+            file.write(f"{task['status']}|{task['task']}\n")
+
+
+# View tasks
+def view_tasks(tasks):
+    if not tasks:
+        print("\n📭 No tasks available!\n")
+        return
+
+    print("\n📋 YOUR TASKS")
+    print("-" * 40)
+
+    for i, task in enumerate(tasks, start=1):
+        symbol = "✅" if task["status"] == "Done" else "⏳"
+        print(f"{i}. {symbol} {task['task']}")
+
+    print("-" * 40)
+
+
+# Add task
+def add_task(tasks):
+    task_name = input("Enter new task: ").strip()
+
+    if task_name:
+        tasks.append({"task": task_name, "status": "Pending"})
+        save_tasks(tasks)
+        print("✅ Task added successfully!")
+    else:
+        print("❌ Task cannot be empty.")
+
+
+# Mark task as completed
+def complete_task(tasks):
+    view_tasks(tasks)
+
+    if not tasks:
+        return
+
+    try:
+        index = int(input("Enter task number to mark as completed: "))
+
+        if 1 <= index <= len(tasks):
+            tasks[index - 1]["status"] = "Done"
+            save_tasks(tasks)
+            print("🎉 Task marked as completed!")
+        else:
+            print("❌ Invalid task number.")
+
+    except ValueError:
+        print("❌ Please enter a valid number.")
+
+
+# Delete task
+def delete_task(tasks):
+    view_tasks(tasks)
+
+    if not tasks:
+        return
+
+    try:
+        index = int(input("Enter task number to delete: "))
+
+        if 1 <= index <= len(tasks):
+            removed = tasks.pop(index - 1)
+            save_tasks(tasks)
+            print(f"🗑️ Deleted: {removed['task']}")
+        else:
+            print("❌ Invalid task number.")
+
+    except ValueError:
+        print("❌ Please enter a valid number.")
+
+
+# Main menu
+def main():
+    tasks = load_tasks()
+
+    while True:
+        print("\n" + "=" * 45)
+        print("📝 TO-DO LIST APPLICATION")
+        print("=" * 45)
+        print("1️⃣  View Tasks")
+        print("2️⃣  Add Task")
+        print("3️⃣  Mark Task as Completed")
+        print("4️⃣  Delete Task")
+        print("5️⃣  Exit")
+        print("=" * 45)
+
+        choice = input("Choose an option (1-5): ").strip()
+
+        if choice == "1":
+            view_tasks(tasks)
+
+        elif choice == "2":
+            add_task(tasks)
+
+        elif choice == "3":
+            complete_task(tasks)
+
+        elif choice == "4":
+            delete_task(tasks)
+
+        elif choice == "5":
+            print("\n👋 Thank you for using To-Do List App!")
+            break
+
+        else:
+            print("❌ Invalid choice. Please select 1-5.")
+
+
+# Run application
+main()
